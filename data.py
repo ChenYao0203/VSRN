@@ -54,7 +54,7 @@ class FlickrDataset(data.Dataset):
         self.ids = []
         for i, d in enumerate(self.dataset):
             if d['split'] == split:
-                self.ids += [(i, x) for x in range(len(d['sentences']))]
+                self.ids += [(i, x) for x in range(len(d['sentences']))] #获取的id是每一个图像的id，每一个id对应了五个句子
 
     def __getitem__(self, index):
         """This function returns a tuple that is further passed to collate_fn
