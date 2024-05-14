@@ -54,7 +54,7 @@ class FlickrDataset(data.Dataset):
         self.ids = []
         for i, d in enumerate(self.dataset):
             if d['split'] == split:
-                self.ids += [(i, x) for x in range(len(d['sentences']))] #获取的id是每一个图像的id，每一个id对应了五个句子
+                self.ids += [(i, x) for x in range(len(d['sentences']))] #获取的id是每一个图像的id，每一个id对应了五个标题
 
     def __getitem__(self, index):
         """This function returns a tuple that is further passed to collate_fn
@@ -88,7 +88,7 @@ def collate_fn(data):
     """Build mini-batch tensors from a list of (image, caption) tuples.
     Args:
         data: list of (image, caption) tuple.
-            - image: torch tensor of shape (3, 256, 256).
+            - image: torch tensor of shape (3, 256, 256). 
             - caption: torch tensor of shape (?); variable length.
 
     Returns:
@@ -138,7 +138,7 @@ def get_loader_single(data_name, split, root, json, vocab, transform,
 
 
 
-
+#此处的transform可以直接调用CLIP的接口
 def get_transform(data_name, split_name, opt):
     normalizer = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                       std=[0.229, 0.224, 0.225])
