@@ -173,7 +173,8 @@ def i2t(images, captions, images2, captions2, npts=None, measure='cosine', retur
     if npts is None:
         npts = images.shape[0] // 5
     index_list = []
-
+    
+    #ranks、top1的长度和图像数量保持一致
     ranks = numpy.zeros(npts)
     top1 = numpy.zeros(npts)
     for index in range(npts):
@@ -192,7 +193,7 @@ def i2t(images, captions, images2, captions2, npts=None, measure='cosine', retur
                 d2 = d2.cpu().numpy()
             d = d2[index % bs]
         else:
-            d = numpy.dot(im, captions.T).flatten()
+            h = numpy.dot(im, captions.T).flatten()
             d2 = numpy.dot(im_2, captions2.T).flatten()
             d = (d + d2)/2
             
