@@ -112,7 +112,7 @@ def encode_data(model, data_loader, log_step=10, logging=print):
 
 
 #测试函数
-def evalrank(model_path, model_path2, data_path=None, split='dev', fold5=False):
+def evalrank(model_path, model_path2, data_path=None, split='dev'):
     """
     Evaluate a trained model on either dev or test. If `fold5=True`, 5 fold
     cross-validation is done (only for MSCOCO). Otherwise, the full data is
@@ -151,56 +151,23 @@ def evalrank(model_path, model_path2, data_path=None, split='dev', fold5=False):
     print('Computing results...')
     img_embs, cap_embs = encode_data(model, data_loader)
     img_embs2, cap_embs2 = encode_data(model2, data_loader)
-#测试的图像的数量和标题的数量
+    
+    #测试的图像的数量和标题的数量
     print('Images: %d, Captions: %d' %
           (img_embs.shape[0] / 5, cap_embs.shape[0]))
 
-    if not fold5:
-        # no cross-validation, full evaluation
-        r, rt = i2t(img_embs, cap_embs, img_embs2, cap_embs2, measure=opt.measure, return_ranks=True)
-        ri, rti = t2i(img_embs, cap_embs, img_embs2, cap_embs2, 
-                      measure=opt.measure, return_ranks=True)
-        ar = (r[0] + r[1] + r[2]) / 3
-        ari = (ri[0] + ri[1] + ri[2]) / 3
-        rsum = r[0] + r[1] + r[2] + ri[0] + ri[1] + ri[2]
-        print("rsum: %.1f" % rsum)
-        print("Average i2t Recall: %.1f" % ar)
-        print("Image to text: %.1f %.1f %.1f %.1f %.1f" % r)
-        print("Average t2i Recall: %.1f" % ari)
-        print("Text to image: %.1f %.1f %.1f %.1f %.1f" % ri)
-    else:
-        # 5fold cross-validation, only for MSCOCO
-        results = []
-        for i in range(5):
-            r, rt0 = i2t(img_embs[i * 5000:(i + 1) * 5000], cap_embs[i * 5000:(i + 1) *5000], 
-                img_embs2[i * 5000:(i + 1) * 5000], cap_embs2[i * 5000:(i + 1) *5000], 
-                measure=opt.measure,
-                         return_ranks=True)
-            print("Image to text: %.1f, %.1f, %.1f, %.1f, %.1f" % r)
-            ri, rti0 = t2i(img_embs[i * 5000:(i + 1) * 5000],cap_embs[i * 5000:(i + 1) *5000], 
-                img_embs2[i * 5000:(i + 1) * 5000],cap_embs2[i * 5000:(i + 1) *5000], 
-                measure=opt.measure,
-                           return_ranks=True)
-            if i == 0:
-                rt, rti = rt0, rti0
-            print("Text to image: %.1f, %.1f, %.1f, %.1f, %.1f" % ri)
-            ar = (r[0] + r[1] + r[2]) / 3
-            ari = (ri[0] + ri[1] + ri[2]) / 3
-            rsum = r[0] + r[1] + r[2] + ri[0] + ri[1] + ri[2]
-            print("rsum: %.1f ar: %.1f ari: %.1f" % (rsum, ar, ari))
-            results += [list(r) + list(ri) + [ar, ari, rsum]]
-
-        print("-----------------------------------")
-        print("Mean metrics: ")
-        mean_metrics = tuple(np.array(results).mean(axis=0).flatten())
-        print("rsum: %.1f" % (mean_metrics[10] * 6))
-        print("Average i2t Recall: %.1f" % mean_metrics[11])
-        print("Image to text: %.1f %.1f %.1f %.1f %.1f" %
-              mean_metrics[:5])
-        print("Average t2i Recall: %.1f" % mean_metrics[12])
-        print("Text to image: %.1f %.1f %.1f %.1f %.1f" %
-              mean_metrics[5:10])
-
+    # no cross-validation, full evaluation
+    r, rt = i2t(img_embs, cap_embs, img_embs2, cap_embs2, measure=opt.measure, return_ranks=True)
+    ri, rti = t2i(img_embs, cap_embs, img_embs2, cap_embs2, 
+                  measure=opt.measure, return_ranks=True)
+    ar = (r[0] + r[1] + r[2]) / 3
+    ari = (ri[0] + ri[1] + ri[2]) / 3
+    rsum = r[0] + r[1] + r[2] + ri[0] + ri[1] + ri[2]
+    print("rsum: %.1f" % rsum)
+    print("Average i2t Recall: %.1f" % ar)
+    print("Image to text: %.1f %.1f %.1f %.1f %.1f" % r)
+    print("Average t2i Recall: %.1f" % ari)
+    print("Text to image: %.1f %.1f %.1f %.1f %.1f" % ri)
     torch.save({'rt': rt, 'rti': rti}, 'ranks.pth.tar')
 
 
