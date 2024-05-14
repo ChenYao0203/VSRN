@@ -98,7 +98,8 @@ def collate_fn(data):
     """
     # Sort a data list by caption length
     data.sort(key=lambda x: len(x[1]), reverse=True)
-    images, captions, ids, img_ids, caption_labels, caption_masks = zip(*data)
+    # ids是每一条数据的index, img_ids是图像的id,后面两个不知道怎么来的
+    images, captions, ids, img_ids, caption_labels, caption_masks = zip(*data) 
 
     # Merge images (convert tuple of 3D tensor to 4D tensor)
     images = torch.stack(images, 0)
