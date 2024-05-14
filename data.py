@@ -55,7 +55,7 @@ class FlickrDataset(data.Dataset):
         for i, d in enumerate(self.dataset):
             if d['split'] == split:
                 self.ids += [(i, x) for x in range(len(d['sentences']))] #获取的id是每一个图像的id，每一个id对应了五个标题
-
+    #get_item获取的image是预处理过的，标题是tokenize过的，但是长度不一样，在这里可以直接调用CLIP的token_ize，把CLIP的tokenize封装为get_tokenize的函数
     def __getitem__(self, index):
         """This function returns a tuple that is further passed to collate_fn
         """
