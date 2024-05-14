@@ -71,7 +71,7 @@ class LogCollector(object):
         for k, v in self.meters.iteritems():
             tb_logger.log_value(prefix + k, v.val, step=step)
 
-
+#这里调用CLIP
 def encode_data(model, data_loader, log_step=10, logging=print):
     """Encode all images and captions loadable by `data_loader`
     """
@@ -111,7 +111,7 @@ def encode_data(model, data_loader, log_step=10, logging=print):
 
 
 
-
+#测试函数
 def evalrank(model_path, model_path2, data_path=None, split='dev', fold5=False):
     """
     Evaluate a trained model on either dev or test. If `fold5=True`, 5 fold
@@ -258,5 +258,7 @@ def i2t(images, captions, images2, captions2, npts=None, measure='cosine', retur
         return (r1, r5, r10, medr, meanr), (ranks, top1)
     else:
         return (r1, r5, r10, medr, meanr)
-
+if __name__='__main__':
+  
+    = evalrank()
 
