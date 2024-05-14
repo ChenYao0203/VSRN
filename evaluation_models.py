@@ -159,9 +159,6 @@ def evalrank(model_path, model_path2, data_path=None, split='dev'):
     # no cross-validation, full evaluation
     r, rt = i2t(img_embs, cap_embs, img_embs2, cap_embs2, measure=opt.measure, return_ranks=True)
     ar = (r[0] + r[1] + r[2]) / 3
-    ari = (ri[0] + ri[1] + ri[2]) / 3
-    rsum = r[0] + r[1] + r[2] + ri[0] + ri[1] + ri[2]
-    print("rsum: %.1f" % rsum)
     print("Average i2t Recall: %.1f" % ar)
     print("Image to text: %.1f %.1f %.1f %.1f %.1f" % r)
     torch.save({'rt': rt}, 'ranks.pth.tar')
