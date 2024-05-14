@@ -63,22 +63,22 @@ class FlickrDataset(data.Dataset):
         root = self.root
         ann_id = self.ids[index]
         img_id = ann_id[0]
-        caption = self.dataset[img_id]['sentences'][ann_id[1]]['raw']
+        caption = self.dataset[img_id]['sentences'][ann_id[1]]['raw'] #获得原始标题文本,只获取了图像对应的一个标题
         path = self.dataset[img_id]['filename']
 
-        image = Image.open(os.path.join(root, path)).convert('RGB')
+        image = Image.open(os.path.join(root, path)).convert('RGB') #打开原始图像，只获取了一张图像
         if self.transform is not None:
             image = self.transform(image)
 
-        # Convert caption (string) to word ids.
+        # Convert caption (string) to word ids. 将标题转换为 word id
         tokens = nltk.tokenize.word_tokenize(
-            str(caption).lower().decode('utf-8'))
+            str(caption).lower().decode('utf-8')) #这里的token_ize可以直接调用CLIP
         caption = []
         caption.append(vocab('<start>'))
         caption.extend([vocab(token) for token in tokens])
         caption.append(vocab('<end>'))
         target = torch.Tensor(caption)
-        return image, target, index, img_id
+        return image, target, index, img_id #每一条数据包括，预处理之后的一个图像、tokenize之后的caption，这条数据对应的index，以及图像对应的id
 
     def __len__(self):
         return len(self.ids)
