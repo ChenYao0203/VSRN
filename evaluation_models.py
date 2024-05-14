@@ -211,7 +211,7 @@ def i2t(images, captions, images2, captions2, npts=None, measure='cosine', retur
     Captions: (5N, K) matrix of captions
     """
     if npts is None:
-        npts = images.shape[0] / 5
+        npts = images.shape[0] // 5
     index_list = []
 
     ranks = numpy.zeros(npts)
