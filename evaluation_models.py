@@ -259,6 +259,6 @@ def i2t(images, captions, images2, captions2, npts=None, measure='cosine', retur
     else:
         return (r1, r5, r10, medr, meanr)
 if __name__='__main__':
-  
-    = evalrank()
+    print('Evaluation on Flickr30K:')
+    evalrank("pretrain_model/flickr/model_fliker_1.pth.tar", "pretrain_model/flickr/model_fliker_2.pth.tar", data_path='data/', split="test", fold5=False)
 
