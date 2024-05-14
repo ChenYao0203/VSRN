@@ -151,7 +151,7 @@ def evalrank(model_path, model_path2, data_path=None, split='dev', fold5=False):
     print('Computing results...')
     img_embs, cap_embs = encode_data(model, data_loader)
     img_embs2, cap_embs2 = encode_data(model2, data_loader)
-
+#测试的图像的数量和标题的数量
     print('Images: %d, Captions: %d' %
           (img_embs.shape[0] / 5, cap_embs.shape[0]))
 
