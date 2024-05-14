@@ -79,7 +79,7 @@ class FlickrDataset(data.Dataset):
         caption.append(vocab('<end>'))
         target = torch.Tensor(caption)
         return image, target, index, img_id #每一条数据包括，预处理之后的一个图像、tokenize之后的caption，这条数据对应的index，以及图像对应的id
-
+    #获取的是所有标题的数量
     def __len__(self):
         return len(self.ids)
 
