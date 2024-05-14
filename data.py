@@ -29,48 +29,12 @@ def get_paths(path, name='coco', use_restval=False):
     """
     roots = {}
     ids = {}
-    if 'coco' == name:
-        imgdir = os.path.join(path, 'images')
-        capdir = os.path.join(path, 'annotations')
-        roots['train'] = {
-            'img': os.path.join(imgdir, 'train2014'),
-            'cap': os.path.join(capdir, 'captions_train2014.json')
-        }
-        roots['val'] = {
-            'img': os.path.join(imgdir, 'val2014'),
-            'cap': os.path.join(capdir, 'captions_val2014.json')
-        }
-        roots['test'] = {
-            'img': os.path.join(imgdir, 'val2014'),
-            'cap': os.path.join(capdir, 'captions_val2014.json')
-        }
-        roots['trainrestval'] = {
-            'img': (roots['train']['img'], roots['val']['img']),
-            'cap': (roots['train']['cap'], roots['val']['cap'])
-        }
-        ids['train'] = np.load(os.path.join(capdir, 'coco_train_ids.npy'))
-        ids['val'] = np.load(os.path.join(capdir, 'coco_dev_ids.npy'))[:5000]
-        ids['test'] = np.load(os.path.join(capdir, 'coco_test_ids.npy'))
-        ids['trainrestval'] = (
-            ids['train'],
-            np.load(os.path.join(capdir, 'coco_restval_ids.npy')))
-        if use_restval:
-            roots['train'] = roots['trainrestval']
-            ids['train'] = ids['trainrestval']
-    elif 'f8k' == name:
-        imgdir = os.path.join(path, 'images')
-        cap = os.path.join(path, 'dataset_flickr8k.json')
-        roots['train'] = {'img': imgdir, 'cap': cap}
-        roots['val'] = {'img': imgdir, 'cap': cap}
-        roots['test'] = {'img': imgdir, 'cap': cap}
-        ids = {'train': None, 'val': None, 'test': None}
-    elif 'f30k' == name:
-        imgdir = os.path.join(path, 'images')
-        cap = os.path.join(path, 'dataset_flickr30k.json')
-        roots['train'] = {'img': imgdir, 'cap': cap}
-        roots['val'] = {'img': imgdir, 'cap': cap}
-        roots['test'] = {'img': imgdir, 'cap': cap}
-        ids = {'train': None, 'val': None, 'test': None}
+    imgdir = os.path.join(path, 'images')
+    cap = os.path.join(path, 'dataset_flickr30k.json')
+    roots['train'] = {'img': imgdir, 'cap': cap}
+    roots['val'] = {'img': imgdir, 'cap': cap}
+    roots['test'] = {'img': imgdir, 'cap': cap}
+    ids = {'train': None, 'val': None, 'test': None}
 
     return roots, ids
 
