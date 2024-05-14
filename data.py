@@ -2,11 +2,11 @@ import torch
 import torch.utils.data as data
 import torchvision.transforms as transforms
 import os
-import nltk
 from PIL import Image
 from pycocotools.coco import COCO
 import numpy as np
 import json as jsonmod
+import clip
 
 
 def get_paths(path, name='coco', use_restval=False):
@@ -38,6 +38,10 @@ def get_paths(path, name='coco', use_restval=False):
 
     return roots, ids
 
+def get_clip_tokenize(prompt_caption):
+    model, preprocess = clip.load("ViT-B/32")
+    prompt_caption_token = preprocess(prompt_caption)
+    return prompt_caption_token
 
 
 class FlickrDataset(data.Dataset):
@@ -45,11 +49,9 @@ class FlickrDataset(data.Dataset):
     Dataset loader for Flickr30k and Flickr8k full datasets.
     """
 
-    def __init__(self, root, json, split, vocab, transform=None):
+    def __init__(self, root, json, split):
         self.root = root
-        self.vocab = vocab
         self.split = split
-        self.transform = transform
         self.dataset = jsonmod.load(open(json, 'r'))['images']
         self.ids = []
         for i, d in enumerate(self.dataset):
@@ -59,26 +61,20 @@ class FlickrDataset(data.Dataset):
     def __getitem__(self, index):
         """This function returns a tuple that is further passed to collate_fn
         """
-        vocab = self.vocab
         root = self.root
         ann_id = self.ids[index]
         img_id = ann_id[0]
         caption = self.dataset[img_id]['sentences'][ann_id[1]]['raw'] #获得原始标题文本,只获取了图像对应的一个标题
+        prompt_caption = " " + caption #变换提示
         path = self.dataset[img_id]['filename']
 
         image = Image.open(os.path.join(root, path)).convert('RGB') #打开原始图像，只获取了一张图像
-        if self.transform is not None:
-            image = self.transform(image)
+        image = clip.transform(image)
 
         # Convert caption (string) to word ids. 将标题转换为 word id
-        tokens = nltk.tokenize.word_tokenize(
-            str(caption).lower().decode('utf-8')) #这里的token_ize可以直接调用CLIP
-        caption = []
-        caption.append(vocab('<start>'))
-        caption.extend([vocab(token) for token in tokens])
-        caption.append(vocab('<end>'))
-        target = torch.Tensor(caption)
-        return image, target, index, img_id #每一条数据包括，预处理之后的一个图像、tokenize之后的caption，这条数据对应的index，以及图像对应的id
+        
+        prompt_caption_token = get_clip_tokenize(prompt_caption)
+        return image, prompt_caption_token, index, img_id #每一条数据包括，预处理之后的一个图像、tokenize之后的caption，这条数据对应的index，以及图像对应的id
     #获取的是所有标题的数量
     def __len__(self):
         return len(self.ids)
@@ -89,33 +85,20 @@ def collate_fn(data):
     Args:
         data: list of (image, caption) tuple.
             - image: torch tensor of shape (3, 256, 256). 
-            - caption: torch tensor of shape (?); variable length.
+            - caption: torch tensor of shape (?); length.
 
     Returns:
         images: torch tensor of shape (batch_size, 3, 256, 256).
         targets: torch tensor of shape (batch_size, padded_length).
         lengths: list; valid length for each padded caption.
     """
-    # Sort a data list by caption length
-    data.sort(key=lambda x: len(x[1]), reverse=True)
     # ids是每一条数据的index, img_ids是图像的id,后面两个不知道怎么来的
-    images, captions, ids, img_ids, caption_labels, caption_masks = zip(*data) 
+    images, captions, ids, img_ids = zip(*data) 
 
     # Merge images (convert tuple of 3D tensor to 4D tensor)
     images = torch.stack(images, 0)
-
-    caption_labels_ = torch.stack(caption_labels, 0)
-    caption_masks_ = torch.stack(caption_masks, 0)
-
-    # Merget captions (convert tuple of 1D tensor to 2D tensor)
-    lengths = [len(cap) for cap in captions]
-    targets = torch.zeros(len(captions), max(lengths)).long()
-    for i, cap in enumerate(captions):
-        end = lengths[i]
-        targets[i, :end] = cap[:end]
-
-
-    return images, targets, lengths, ids, caption_labels_, caption_masks_
+    prompt_captions =torch.stack(captions,0)
+    return images, prompt_captions, ids
 
 
 def get_loader_single(data_name, split, root, json, vocab, transform,
@@ -139,22 +122,7 @@ def get_loader_single(data_name, split, root, json, vocab, transform,
 
 
 
-#此处的transform可以直接调用CLIP的接口
-def get_transform(data_name, split_name, opt):
-    normalizer = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                      std=[0.229, 0.224, 0.225])
-    t_list = []
-    if split_name == 'train':
-        t_list = [transforms.RandomResizedCrop(opt.crop_size),
-                  transforms.RandomHorizontalFlip()]
-    elif split_name == 'val':
-        t_list = [transforms.Resize(256), transforms.CenterCrop(224)]
-    elif split_name == 'test':
-        t_list = [transforms.Resize(256), transforms.CenterCrop(224)]
 
-    t_end = [transforms.ToTensor(), normalizer]
-    transform = transforms.Compose(t_list + t_end)
-    return transform
 
 
 def get_loaders(data_name, vocab, crop_size, batch_size, workers, opt):
