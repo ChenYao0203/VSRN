@@ -206,8 +206,8 @@ def i2t(images, captions, images2, captions2, npts=None, measure='cosine', retur
             tmp = numpy.where(inds == i)[0][0]
             if tmp < rank:
                 rank = tmp
-        ranks[index] = rank
-        top1[index] = inds[0]
+        ranks[index] = rank #图像的label标题在检索排名中最靠前的排名
+        top1[index] = inds[0] #图像对应的检索排名第一的标题index
 
     # Compute metrics
     r1 = 100.0 * len(numpy.where(ranks < 1)[0]) / len(ranks)
