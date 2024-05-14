@@ -84,11 +84,6 @@ class FlickrDataset(data.Dataset):
         return len(self.ids)
 
 
-
-
-   
-
-
 def collate_fn(data):
     """Build mini-batch tensors from a list of (image, caption) tuples.
     Args:
@@ -126,14 +121,7 @@ def get_loader_single(data_name, split, root, json, vocab, transform,
                       batch_size=100, shuffle=True,
                       num_workers=2, ids=None, collate_fn=collate_fn):
     """Returns torch.utils.data.DataLoader for custom coco dataset."""
-    if 'coco' in data_name:
-        # COCO custom dataset
-        dataset = CocoDataset(root=root,
-                              json=json,
-                              vocab=vocab,
-                              transform=transform, ids=ids)
-    elif 'f8k' in data_name or 'f30k' in data_name:
-        dataset = FlickrDataset(root=root,
+    dataset = FlickrDataset(root=root,
                                 split=split,
                                 json=json,
                                 vocab=vocab,
