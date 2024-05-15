@@ -8,8 +8,7 @@ import numpy as np
 import json as jsonmod
 import clip
 
-
-def get_paths(path, name='coco', use_restval=False):
+def get_paths(path, name='coco')
     """
     Returns paths to images and annotations for the given datasets. For MSCOCO
     indices are also returned to control the data split being used.
@@ -64,8 +63,8 @@ class FlickrDataset(data.Dataset):
         root = self.root
         ann_id = self.ids[index]
         img_id = ann_id[0]
-        caption = self.dataset[img_id]['sentences'][ann_id[1]]['raw'] #获得原始标题文本,只获取了图像对应的一个标题
-        prompt_caption = " " + caption #变换提示
+        prompt_caption = self.dataset[img_id]['sentences'][ann_id[1]]['raw'] #获得原始标题文本,只获取了图像对应的一个标题
+        # prompt_caption = " " + caption #变换提示
         path = self.dataset[img_id]['filename']
 
         image = Image.open(os.path.join(root, path)).convert('RGB') #打开原始图像，只获取了一张图像
@@ -101,15 +100,13 @@ def collate_fn(data):
     return images, prompt_captions, ids
 
 
-def get_loader_single(data_name, split, root, json, vocab, transform,
+def get_loader_single(data_name, split, root, json,
                       batch_size=100, shuffle=True,
                       num_workers=2, ids=None, collate_fn=collate_fn):
     """Returns torch.utils.data.DataLoader for custom coco dataset."""
     dataset = FlickrDataset(root=root,
                                 split=split,
-                                json=json,
-                                vocab=vocab,
-                                transform=transform)
+                                json=json,)
 
     # Data loader
     data_loader = torch.utils.data.DataLoader(dataset=dataset,
