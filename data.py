@@ -152,16 +152,16 @@ def get_loaders(data_name, vocab, crop_size, batch_size, workers, opt):
     return train_loader, val_loader
 
 
-def get_test_loader(data_name, vocab, crop_size, batch_size,
-                    workers, opt):
-    dpath = os.path.join(opt.data_path, data_name)
+def get_test_loader(data_path, data_name, batch_size,
+                    workers):
+    dpath = os.path.join(data_path, data_name)
 
     # Build Dataset Loader
-    roots, ids = get_paths(dpath, data_name, opt.use_restval)
-    test_loader = get_loader_single(opt.data_name, 'test',
+    roots, ids = get_paths(dpath, data_name)
+    test_loader = get_loader_single(data_name, 'test',
                                     roots['test']['img'],
                                     roots['test']['cap'],
-                                    vocab, transform, ids=ids['test'],
+                                    ids=ids['test'],
                                     batch_size=batch_size, shuffle=False,
                                     num_workers=workers,
                                     collate_fn=collate_fn)
