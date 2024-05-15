@@ -1,7 +1,7 @@
 from __future__ import print_function
 import os
 import pickle
-
+import clip
 import torch
 import numpy
 from data import get_test_loader
@@ -79,8 +79,7 @@ def encode_data(model, data_loader, log_step=10, logging=print):
     val_logger = LogCollector()
 
     # switch to evaluate mode
-    model.val_start()
-
+    model, preprocess = clip.load()
     end = time.time()
 
     # numpy array to keep all the embeddings
@@ -145,8 +144,7 @@ def evalrank(model_path, model_path2, data_path=None, split='dev'):
     model2.load_state_dict(checkpoint2['model'])
 
     print('Loading dataset')
-    data_loader = get_test_loader(split, opt.data_name, vocab, opt.crop_size,
-                                  opt.batch_size, opt.workers, opt)
+    data_loader = get_test_loader()
 
     print('Computing results...')
     img_embs, cap_embs = encode_data(model, data_loader)
