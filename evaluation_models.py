@@ -79,7 +79,7 @@ def encode_data(model, data_loader, log_step=10, logging=print):
     val_logger = LogCollector()
 
     # switch to evaluate mode
-    model, preprocess = clip.load()
+    model, preprocess = clip.load("ViT-B/32")
     end = time.time()
 
     # numpy array to keep all the embeddings
